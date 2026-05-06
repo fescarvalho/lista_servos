@@ -88,7 +88,7 @@ export default function RegistrationForm() {
                 id="nome"
                 name="nome"
                 required
-                className={`block w-full pl-10 pr-3 py-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all ${
+                className={`block w-full pl-10 pr-3 py-3 border rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all ${
                   errors.nome ? 'border-red-500' : 'border-slate-200'
                 }`}
                 placeholder="Ex: João Silva"
@@ -114,7 +114,7 @@ export default function RegistrationForm() {
                 id="dataNascimento"
                 name="dataNascimento"
                 required
-                className={`block w-full pl-10 pr-3 py-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all ${
+                className={`block w-full pl-10 pr-3 py-3 border rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all ${
                   errors.dataNascimento ? 'border-red-500' : 'border-slate-200'
                 }`}
                 value={formData.dataNascimento}
@@ -146,10 +146,16 @@ export default function RegistrationForm() {
         </form>
       </div>
       
-      <div className="px-8 py-4 bg-slate-50 border-t border-slate-100 flex justify-center">
-        <p className="text-xs text-slate-400">
+      <div className="px-8 py-4 bg-slate-50 border-t border-slate-100 flex flex-col items-center gap-2">
+        <p className="text-xs text-slate-400 text-center">
           Dados protegidos e armazenados com segurança.
         </p>
+        <a 
+          href="/lista" 
+          className="text-xs text-indigo-600 hover:text-indigo-800 font-medium underline transition-colors"
+        >
+          Ver todos os cadastros
+        </a>
       </div>
     </motion.div>
   )
