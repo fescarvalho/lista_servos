@@ -252,7 +252,7 @@ export default function ListaPage() {
                       <td className="px-2 sm:px-6 py-3 sm:py-4 text-slate-600 text-xs sm:text-sm whitespace-nowrap">
                         <div className="flex items-center gap-1 sm:gap-2">
                           <Calendar size={14} className="text-slate-400 hidden sm:block" />
-                          {new Date(pessoa.dataNascimento).toLocaleDateString('pt-BR')}
+                          {new Date(pessoa.dataNascimento).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}
                         </div>
                       </td>
                       <td className="px-2 sm:px-6 py-3 sm:py-4 text-slate-400 text-[10px] sm:text-sm hidden lg:table-cell">

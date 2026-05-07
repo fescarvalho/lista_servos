@@ -5,7 +5,10 @@ export const pessoaSchema = z.object({
   bairro: z.string().min(2, 'O bairro deve ter pelo menos 2 caracteres').max(50, 'O bairro é muito longo'),
   dataNascimento: z.string().refine((date) => !isNaN(Date.parse(date)), {
     message: 'Data de nascimento inválida',
-  }).transform((date) => new Date(date)),
+  }).transform((date) => {
+    const [year, month, day] = date.split('-').map(Number);
+    return new Date(Date.UTC(year, month - 1, day));
+  }),
 })
 
 
