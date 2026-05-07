@@ -175,8 +175,8 @@ export default function ListaPage() {
   }
 
   return (
-    <main className="flex flex-col items-center min-h-screen p-4 md:p-12 bg-slate-50 text-slate-900">
-      <div className="w-full max-w-6xl">
+    <main className="flex flex-col items-center min-h-screen p-2 md:p-12 bg-slate-50 text-slate-900">
+      <div className="w-full max-w-7xl">
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
           <div>
             <Link 
@@ -209,11 +209,11 @@ export default function ListaPage() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-slate-50">
-                  <th className="px-6 py-4 text-sm font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100">Nome</th>
-                  <th className="px-6 py-4 text-sm font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100">Bairro</th>
-                  <th className="px-6 py-4 text-sm font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100">Nascimento</th>
-                  <th className="px-6 py-4 text-sm font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100">Data Cadastro</th>
-                  <th className="px-6 py-4 text-sm font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100 text-right">Ações</th>
+                  <th className="px-2 sm:px-6 py-4 text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100">Nome</th>
+                  <th className="px-2 sm:px-6 py-4 text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100">Bairro</th>
+                  <th className="px-2 sm:px-6 py-4 text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100">Nascimento</th>
+                  <th className="px-2 sm:px-6 py-4 text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100 hidden lg:table-cell">Data Cadastro</th>
+                  <th className="px-2 sm:px-6 py-4 text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100 text-right">Ações</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -235,41 +235,41 @@ export default function ListaPage() {
                 ) : (
                   pessoas.map((pessoa) => (
                     <tr key={pessoa.id} className="hover:bg-indigo-50/30 transition-colors group">
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                      <td className="px-2 sm:px-6 py-3 sm:py-4">
+                        <div className="flex items-center gap-2 sm:gap-3">
+                          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold group-hover:bg-indigo-600 group-hover:text-white transition-colors text-xs sm:text-base">
                             {pessoa.nome.charAt(0).toUpperCase()}
                           </div>
-                          <span className="font-semibold text-slate-800">{pessoa.nome}</span>
+                          <span className="font-semibold text-slate-800 text-xs sm:text-sm">{pessoa.nome}</span>
                         </div>
                       </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2 text-slate-600">
-                          <MapPin size={16} className="text-slate-400" />
+                      <td className="px-2 sm:px-6 py-3 sm:py-4">
+                        <div className="flex items-center gap-1 sm:gap-2 text-slate-600 text-xs sm:text-sm">
+                          <MapPin size={14} className="text-slate-400 hidden sm:block" />
                           {pessoa.bairro || '---'}
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-slate-600">
-                        <div className="flex items-center gap-2">
-                          <Calendar size={16} className="text-slate-400" />
+                      <td className="px-2 sm:px-6 py-3 sm:py-4 text-slate-600 text-xs sm:text-sm whitespace-nowrap">
+                        <div className="flex items-center gap-1 sm:gap-2">
+                          <Calendar size={14} className="text-slate-400 hidden sm:block" />
                           {new Date(pessoa.dataNascimento).toLocaleDateString('pt-BR')}
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-slate-400 text-sm">
+                      <td className="px-2 sm:px-6 py-3 sm:py-4 text-slate-400 text-[10px] sm:text-sm hidden lg:table-cell">
                         {new Date(pessoa.createdAt).toLocaleString('pt-BR')}
                       </td>
-                      <td className="px-6 py-4 text-right">
-                        <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <td className="px-2 sm:px-6 py-3 sm:py-4 text-right">
+                        <div className="flex items-center justify-end gap-1 sm:gap-2 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-opacity">
                           <button
                             onClick={() => handleStartEdit(pessoa)}
-                            className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
+                            className="p-1 sm:p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
                             title="Editar"
                           >
                             <Edit2 size={18} />
                           </button>
                           <button
                             onClick={() => handleDelete(pessoa.id)}
-                            className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                            className="p-1 sm:p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
                             title="Excluir"
                           >
                             <Trash2 size={18} />

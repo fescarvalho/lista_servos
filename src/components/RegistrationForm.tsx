@@ -72,8 +72,8 @@ export default function RegistrationForm() {
     >
       <div className="p-8">
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-slate-800 mb-2">Cadastro</h1>
-          <p className="text-slate-500">Preencha os dados para o grupo de pessoas</p>
+          <h1 className="text-2xl font-bold text-slate-800 mb-2 leading-tight">FORMAÇÃO DE SERVOS E SERVAS DO ALTAR</h1>
+          <p className="text-slate-500 text-sm font-medium">PAROQUIA SANTUARIO DIOCESANO NOSSA SENHORA DA NATIVIDADE</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">

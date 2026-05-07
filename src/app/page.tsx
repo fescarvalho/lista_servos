@@ -10,10 +10,8 @@ export default function Home() {
       </div>
 
       <RegistrationForm />
-      
-      <footer className="mt-12 text-slate-400 text-sm">
-        &copy; {new Date().getFullYear()} Sistema de Coleta de Dados
-      </footer>
+
+
     </main>
   );
 }
