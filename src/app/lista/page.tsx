@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Calendar, User, ArrowLeft, Users, Lock, MapPin, Eye, EyeOff, Trash2, Edit2, X, Check, Save } from 'lucide-react'
+import { Calendar, User, ArrowLeft, Users, Lock, MapPin, Eye, EyeOff, Trash2, Edit2, X, Check, Save, BarChart3, List, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 
@@ -19,6 +19,7 @@ export default function ListaPage() {
     bairro: '',
     dataNascimento: ''
   })
+  const [activeTab, setActiveTab] = useState<'lista' | 'relatorios'>('lista')
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -204,85 +205,235 @@ export default function ListaPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-slate-50">
-                  <th className="px-2 sm:px-6 py-4 text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100">Nome</th>
-                  <th className="px-2 sm:px-6 py-4 text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100">Bairro</th>
-                  <th className="px-2 sm:px-6 py-4 text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100">Nascimento</th>
-                  <th className="px-2 sm:px-6 py-4 text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100 hidden lg:table-cell">Data Cadastro</th>
-                  <th className="px-2 sm:px-6 py-4 text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100 text-right">Ações</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {loading ? (
-                  <tr>
-                    <td colSpan={4} className="px-6 py-12 text-center">
-                      <div className="flex flex-col items-center gap-2 text-slate-400">
-                        <div className="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
-                        Carregando dados...
-                      </div>
-                    </td>
-                  </tr>
-                ) : pessoas.length === 0 ? (
-                  <tr>
-                    <td colSpan={4} className="px-6 py-12 text-center text-slate-400 italic">
-                      Nenhum cadastro encontrado.
-                    </td>
-                  </tr>
-                ) : (
-                  pessoas.map((pessoa) => (
-                    <tr key={pessoa.id} className="hover:bg-indigo-50/30 transition-colors group">
-                      <td className="px-2 sm:px-6 py-3 sm:py-4">
-                        <div className="flex items-center gap-2 sm:gap-3">
-                          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold group-hover:bg-indigo-600 group-hover:text-white transition-colors text-xs sm:text-base">
-                            {pessoa.nome.charAt(0).toUpperCase()}
-                          </div>
-                          <span className="font-semibold text-slate-800 text-xs sm:text-sm">{pessoa.nome}</span>
-                        </div>
-                      </td>
-                      <td className="px-2 sm:px-6 py-3 sm:py-4">
-                        <div className="flex items-center gap-1 sm:gap-2 text-slate-600 text-xs sm:text-sm">
-                          <MapPin size={14} className="text-slate-400 hidden sm:block" />
-                          {pessoa.bairro || '---'}
-                        </div>
-                      </td>
-                      <td className="px-2 sm:px-6 py-3 sm:py-4 text-slate-600 text-xs sm:text-sm whitespace-nowrap">
-                        <div className="flex items-center gap-1 sm:gap-2">
-                          <Calendar size={14} className="text-slate-400 hidden sm:block" />
-                          {new Date(pessoa.dataNascimento).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}
-                        </div>
-                      </td>
-                      <td className="px-2 sm:px-6 py-3 sm:py-4 text-slate-400 text-[10px] sm:text-sm hidden lg:table-cell">
-                        {new Date(pessoa.createdAt).toLocaleString('pt-BR')}
-                      </td>
-                      <td className="px-2 sm:px-6 py-3 sm:py-4 text-right">
-                        <div className="flex items-center justify-end gap-1 sm:gap-2 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button
-                            onClick={() => handleStartEdit(pessoa)}
-                            className="p-1 sm:p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
-                            title="Editar"
-                          >
-                            <Edit2 size={18} />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(pessoa.id)}
-                            className="p-1 sm:p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
-                            title="Excluir"
-                          >
-                            <Trash2 size={18} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+        {/* Tabs */}
+        <div className="flex p-1 bg-slate-200/50 backdrop-blur-sm rounded-2xl mb-8 w-fit border border-slate-200">
+          <button
+            onClick={() => setActiveTab('lista')}
+            className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${
+              activeTab === 'lista' 
+                ? 'bg-white text-indigo-600 shadow-sm' 
+                : 'text-slate-500 hover:text-slate-700'
+            }`}
+          >
+            <List size={18} />
+            Lista de Servos
+          </button>
+          <button
+            onClick={() => setActiveTab('relatorios')}
+            className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${
+              activeTab === 'relatorios' 
+                ? 'bg-white text-indigo-600 shadow-sm' 
+                : 'text-slate-500 hover:text-slate-700'
+            }`}
+          >
+            <BarChart3 size={18} />
+            Relatórios por Bairro
+          </button>
         </div>
+
+        <AnimatePresence mode="wait">
+          {activeTab === 'lista' ? (
+            <motion.div
+              key="lista"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden"
+            >
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-slate-50">
+                      <th className="px-2 sm:px-6 py-4 text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100">Nome</th>
+                      <th className="px-2 sm:px-6 py-4 text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100">Bairro</th>
+                      <th className="px-2 sm:px-6 py-4 text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100">Nascimento</th>
+                      <th className="px-2 sm:px-6 py-4 text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100 hidden lg:table-cell">Data Cadastro</th>
+                      <th className="px-2 sm:px-6 py-4 text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100 text-right">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {loading ? (
+                      <tr>
+                        <td colSpan={5} className="px-6 py-12 text-center">
+                          <div className="flex flex-col items-center gap-2 text-slate-400">
+                            <div className="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+                            Carregando dados...
+                          </div>
+                        </td>
+                      </tr>
+                    ) : pessoas.length === 0 ? (
+                      <tr>
+                        <td colSpan={5} className="px-6 py-12 text-center text-slate-400 italic">
+                          Nenhum cadastro encontrado.
+                        </td>
+                      </tr>
+                    ) : (
+                      pessoas.map((pessoa) => (
+                        <tr key={pessoa.id} className="hover:bg-indigo-50/30 transition-colors group">
+                          <td className="px-2 sm:px-6 py-3 sm:py-4">
+                            <div className="flex items-center gap-2 sm:gap-3">
+                              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold group-hover:bg-indigo-600 group-hover:text-white transition-colors text-xs sm:text-base">
+                                {pessoa.nome.charAt(0).toUpperCase()}
+                              </div>
+                              <span className="font-semibold text-slate-800 text-xs sm:text-sm">{pessoa.nome}</span>
+                            </div>
+                          </td>
+                          <td className="px-2 sm:px-6 py-3 sm:py-4">
+                            <div className="flex items-center gap-1 sm:gap-2 text-slate-600 text-xs sm:text-sm">
+                              <MapPin size={14} className="text-slate-400 hidden sm:block" />
+                              {pessoa.bairro || '---'}
+                            </div>
+                          </td>
+                          <td className="px-2 sm:px-6 py-3 sm:py-4 text-slate-600 text-xs sm:text-sm whitespace-nowrap">
+                            <div className="flex items-center gap-1 sm:gap-2">
+                              <Calendar size={14} className="text-slate-400 hidden sm:block" />
+                              {new Date(pessoa.dataNascimento).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}
+                            </div>
+                          </td>
+                          <td className="px-2 sm:px-6 py-3 sm:py-4 text-slate-400 text-[10px] sm:text-sm hidden lg:table-cell">
+                            {new Date(pessoa.createdAt).toLocaleString('pt-BR')}
+                          </td>
+                          <td className="px-2 sm:px-6 py-3 sm:py-4 text-right">
+                            <div className="flex items-center justify-end gap-1 sm:gap-2 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-opacity">
+                              <button
+                                onClick={() => handleStartEdit(pessoa)}
+                                className="p-1 sm:p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
+                                title="Editar"
+                              >
+                                <Edit2 size={18} />
+                              </button>
+                              <button
+                                onClick={() => handleDelete(pessoa.id)}
+                                className="p-1 sm:p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                                title="Excluir"
+                              >
+                                <Trash2 size={18} />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="relatorios"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="space-y-8"
+            >
+              {/* Chart Card */}
+              <div className="bg-white rounded-3xl shadow-xl border border-slate-100 p-6 md:p-8">
+                <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                  <BarChart3 className="text-indigo-500" />
+                  Distribuição por Bairro
+                </h2>
+                
+                {loading ? (
+                  <div className="py-12 flex flex-col items-center gap-2 text-slate-400">
+                    <div className="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+                    Calculando estatísticas...
+                  </div>
+                ) : pessoas.length === 0 ? (
+                  <div className="py-12 text-center text-slate-400 italic">
+                    Não há dados suficientes para gerar o gráfico.
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    {Object.entries(
+                      pessoas.reduce((acc: any, p: any) => {
+                        const b = p.bairro || 'Não Informado';
+                        acc[b] = (acc[b] || 0) + 1;
+                        return acc;
+                      }, {})
+                    )
+                      .sort((a: any, b: any) => b[1] - a[1])
+                      .map(([name, count]: [string, any]) => {
+                        const percentage = (count / pessoas.length) * 100;
+                        return (
+                          <div key={name} className="space-y-2">
+                            <div className="flex justify-between items-end">
+                              <span className="font-semibold text-slate-700 text-sm">{name}</span>
+                              <div className="flex items-center gap-2">
+                                <span className="text-indigo-600 font-bold">{count}</span>
+                                <span className="text-slate-400 text-xs">({percentage.toFixed(1)}%)</span>
+                              </div>
+                            </div>
+                            <div className="h-3 w-full bg-slate-100 rounded-full overflow-hidden">
+                              <motion.div 
+                                initial={{ width: 0 }}
+                                animate={{ width: `${percentage}%` }}
+                                transition={{ duration: 1, ease: "easeOut" }}
+                                className="h-full bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-full shadow-sm"
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                  </div>
+                )}
+              </div>
+
+              {/* Grouped List Card */}
+              <div className="bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
+                <div className="p-6 border-b border-slate-100">
+                  <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+                    <Users className="text-indigo-500" />
+                    Servos por Bairro
+                  </h2>
+                </div>
+                
+                <div className="divide-y divide-slate-100">
+                  {loading ? (
+                    <div className="p-12 text-center text-slate-400">Carregando...</div>
+                  ) : pessoas.length === 0 ? (
+                    <div className="p-12 text-center text-slate-400 italic">Nenhum servo encontrado.</div>
+                  ) : (
+                    Object.entries(
+                      pessoas.reduce((acc: any, p: any) => {
+                        const b = p.bairro || 'Não Informado';
+                        if (!acc[b]) acc[b] = [];
+                        acc[b].push(p);
+                        return acc;
+                      }, {})
+                    )
+                      .sort((a, b) => a[0].localeCompare(b[0]))
+                      .map(([bairro, members]: [string, any]) => (
+                        <div key={bairro} className="p-6 hover:bg-slate-50 transition-colors">
+                          <div className="flex items-center gap-3 mb-4">
+                            <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600">
+                              <MapPin size={18} />
+                            </div>
+                            <h3 className="font-bold text-slate-800">{bairro}</h3>
+                            <span className="px-2 py-0.5 bg-indigo-100 text-indigo-700 text-xs font-bold rounded-full">
+                              {members.length} {members.length === 1 ? 'servo' : 'servos'}
+                            </span>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 ml-11">
+                            {members.map((member: any) => (
+                              <div key={member.id} className="flex items-center gap-2 p-2 rounded-lg bg-white border border-slate-100 shadow-sm">
+                                <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-600">
+                                  {member.nome.charAt(0).toUpperCase()}
+                                </div>
+                                <span className="text-sm text-slate-700 truncate">{member.nome}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Edit Modal (moved out of the tab container but kept inside main) */}
+
 
         {/* Edit Modal */}
         <AnimatePresence>
