@@ -36,7 +36,11 @@ export default function ListaPage() {
   const fetchData = async () => {
     setLoading(true)
     try {
-      const response = await fetch('/api/pessoas')
+      const response = await fetch('/api/pessoas', {
+        headers: {
+          'x-admin-password': 'adminservos'
+        }
+      })
       if (response.ok) {
 
         const data = await response.json()
@@ -55,6 +59,9 @@ export default function ListaPage() {
     try {
       const response = await fetch(`/api/pessoas/${id}`, {
         method: 'DELETE',
+        headers: {
+          'x-admin-password': 'adminservos'
+        }
       })
 
       if (response.ok) {
@@ -87,6 +94,7 @@ export default function ListaPage() {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'x-admin-password': 'adminservos'
         },
         body: JSON.stringify(editForm),
       })

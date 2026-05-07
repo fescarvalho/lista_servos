@@ -39,8 +39,14 @@ export async function POST(request: Request) {
   }
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    // Audit: Protection against unauthorized access
+    const authHeader = request.headers.get('x-admin-password');
+    if (authHeader !== 'adminservos') {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    }
+
     const pessoas = await prisma.pessoa.findMany({
       orderBy: {
         nome: 'asc',

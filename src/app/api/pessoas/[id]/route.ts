@@ -7,6 +7,12 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Audit: Protection against unauthorized access
+    const authHeader = request.headers.get('x-admin-password');
+    if (authHeader !== 'adminservos') {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    }
+
     const { id } = await params
 
     await prisma.pessoa.delete({
@@ -28,6 +34,12 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Audit: Protection against unauthorized access
+    const authHeader = request.headers.get('x-admin-password');
+    if (authHeader !== 'adminservos') {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    }
+
     const { id } = await params
     const body = await request.json()
 
