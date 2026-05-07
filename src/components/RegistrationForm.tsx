@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { User, Calendar, Send, Loader2, CheckCircle2 } from 'lucide-react'
+import { User, Calendar, Send, Loader2, CheckCircle2, MapPin } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { pessoaSchema } from '@/lib/validations'
 
@@ -10,9 +10,10 @@ export default function RegistrationForm() {
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     nome: '',
+    bairro: '',
     dataNascimento: '',
   })
-  const [errors, setErrors] = useState<{ nome?: string; dataNascimento?: string }>({})
+  const [errors, setErrors] = useState<{ nome?: string; bairro?: string; dataNascimento?: string }>({})
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -26,6 +27,7 @@ export default function RegistrationForm() {
       const fieldErrors = validation.error.flatten().fieldErrors
       setErrors({
         nome: fieldErrors.nome?.[0],
+        bairro: fieldErrors.bairro?.[0],
         dataNascimento: fieldErrors.dataNascimento?.[0],
       })
       setLoading(false)
@@ -53,7 +55,7 @@ export default function RegistrationForm() {
       })
       
       // Clear form
-      setFormData({ nome: '', dataNascimento: '' })
+      setFormData({ nome: '', bairro: '', dataNascimento: '' })
     } catch (error: any) {
       toast.error(error.message || 'Ocorreu um erro inesperado')
     } finally {
@@ -98,6 +100,32 @@ export default function RegistrationForm() {
             </div>
             {errors.nome && (
               <p className="mt-1 text-sm text-red-500">{errors.nome}</p>
+            )}
+          </div>
+
+          <div>
+            <label htmlFor="bairro" className="block text-sm font-medium text-slate-700 mb-1">
+              Bairro
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                <MapPin size={18} />
+              </div>
+              <input
+                type="text"
+                id="bairro"
+                name="bairro"
+                required
+                className={`block w-full pl-10 pr-3 py-3 border rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all ${
+                  errors.bairro ? 'border-red-500' : 'border-slate-200'
+                }`}
+                placeholder="Ex: Centro"
+                value={formData.bairro}
+                onChange={(e) => setFormData({ ...formData, bairro: e.target.value })}
+              />
+            </div>
+            {errors.bairro && (
+              <p className="mt-1 text-sm text-red-500">{errors.bairro}</p>
             )}
           </div>
 

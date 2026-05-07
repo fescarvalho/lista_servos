@@ -9,6 +9,8 @@ datasource db {
 model Pessoa {
   id             String   @id @default(uuid())
   nome           String
+  bairro         String   @default("")
   dataNascimento DateTime
   createdAt      DateTime @default(now())
 }
+

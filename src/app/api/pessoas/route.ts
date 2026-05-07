@@ -16,15 +16,18 @@ export async function POST(request: Request) {
       )
     }
 
-    const { nome, dataNascimento } = result.data
+    const { nome, bairro, dataNascimento } = result.data
 
     // Save to database
     const novaPessoa = await prisma.pessoa.create({
       data: {
-        nome,
-        dataNascimento,
+        nome: nome,
+        bairro: bairro,
+        dataNascimento: dataNascimento,
       },
     })
+
+
 
     return NextResponse.json(novaPessoa, { status: 201 })
   } catch (error) {
@@ -35,3 +38,21 @@ export async function POST(request: Request) {
     )
   }
 }
+
+export async function GET() {
+  try {
+    const pessoas = await prisma.pessoa.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+    })
+    return NextResponse.json(pessoas)
+  } catch (error) {
+    console.error('Error fetching pessoas:', error)
+    return NextResponse.json(
+      { error: 'Erro ao buscar dados' },
+      { status: 500 }
+    )
+  }
+}
+
