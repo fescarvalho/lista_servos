@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Calendar, User, ArrowLeft, Users, Lock, MapPin, Eye, EyeOff, Trash2, Edit2, X, Check, Save, BarChart3, List, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
+import { normalizeBairro } from '@/lib/neighborhood-utils'
 
 export default function ListaPage() {
   const [password, setPassword] = useState('')
@@ -39,7 +40,7 @@ export default function ListaPage() {
       if (response.ok) {
 
         const data = await response.json()
-        setPessoas(data)
+        setPessoas(data.sort((a: any, b: any) => a.nome.localeCompare(b.nome, 'pt-BR')))
       }
     } catch (err) {
       console.error('Erro ao buscar dados:', err)
@@ -92,7 +93,8 @@ export default function ListaPage() {
 
       if (response.ok) {
         const updated = await response.json()
-        setPessoas(pessoas.map(p => p.id === updated.id ? updated : p))
+        const newPessoas = pessoas.map(p => p.id === updated.id ? updated : p)
+        setPessoas(newPessoas.sort((a: any, b: any) => a.nome.localeCompare(b.nome, 'pt-BR')))
         setEditingPessoa(null)
       } else {
         const data = await response.json()
@@ -271,17 +273,12 @@ export default function ListaPage() {
                       pessoas.map((pessoa) => (
                         <tr key={pessoa.id} className="hover:bg-indigo-50/30 transition-colors group">
                           <td className="px-2 sm:px-6 py-3 sm:py-4">
-                            <div className="flex items-center gap-2 sm:gap-3">
-                              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold group-hover:bg-indigo-600 group-hover:text-white transition-colors text-xs sm:text-base">
-                                {pessoa.nome.charAt(0).toUpperCase()}
-                              </div>
-                              <span className="font-semibold text-slate-800 text-xs sm:text-sm">{pessoa.nome}</span>
-                            </div>
+                            <span className="font-semibold text-slate-800 text-xs sm:text-sm">{pessoa.nome}</span>
                           </td>
                           <td className="px-2 sm:px-6 py-3 sm:py-4">
                             <div className="flex items-center gap-1 sm:gap-2 text-slate-600 text-xs sm:text-sm">
                               <MapPin size={14} className="text-slate-400 hidden sm:block" />
-                              {pessoa.bairro || '---'}
+                              {normalizeBairro(pessoa.bairro)}
                             </div>
                           </td>
                           <td className="px-2 sm:px-6 py-3 sm:py-4 text-slate-600 text-xs sm:text-sm whitespace-nowrap">
@@ -346,7 +343,7 @@ export default function ListaPage() {
                   <div className="space-y-6">
                     {Object.entries(
                       pessoas.reduce((acc: any, p: any) => {
-                        const b = p.bairro || 'Não Informado';
+                        const b = normalizeBairro(p.bairro);
                         acc[b] = (acc[b] || 0) + 1;
                         return acc;
                       }, {})
@@ -395,7 +392,7 @@ export default function ListaPage() {
                   ) : (
                     Object.entries(
                       pessoas.reduce((acc: any, p: any) => {
-                        const b = p.bairro || 'Não Informado';
+                        const b = normalizeBairro(p.bairro);
                         if (!acc[b]) acc[b] = [];
                         acc[b].push(p);
                         return acc;
@@ -416,9 +413,6 @@ export default function ListaPage() {
                           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 ml-11">
                             {members.map((member: any) => (
                               <div key={member.id} className="flex items-center gap-2 p-2 rounded-lg bg-white border border-slate-100 shadow-sm">
-                                <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-600">
-                                  {member.nome.charAt(0).toUpperCase()}
-                                </div>
                                 <span className="text-sm text-slate-700 truncate">{member.nome}</span>
                               </div>
                             ))}

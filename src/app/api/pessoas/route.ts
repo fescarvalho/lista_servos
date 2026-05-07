@@ -43,7 +43,7 @@ export async function GET() {
   try {
     const pessoas = await prisma.pessoa.findMany({
       orderBy: {
-        createdAt: 'desc',
+        nome: 'asc',
       },
     })
     return NextResponse.json(pessoas)
