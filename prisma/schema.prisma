@@ -7,10 +7,33 @@ datasource db {
 }
 
 model Pessoa {
-  id             String   @id @default(uuid())
+  id             String     @id @default(uuid())
   nome           String
-  bairro         String   @default("")
+  bairro         String     @default("")
   dataNascimento DateTime
-  createdAt      DateTime @default(now())
+  status         String     @default("EM_FORMACAO")
+  createdAt      DateTime   @default(now())
+  presencas      Presenca[]
+}
+
+model Encontro {
+  id        String     @id @default(uuid())
+  data      DateTime
+  tema      String?
+  createdAt DateTime   @default(now())
+  presencas Presenca[]
+}
+
+model Presenca {
+  id         String   @id @default(uuid())
+  pessoaId   String
+  encontroId String
+  presente   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+
+  pessoa   Pessoa   @relation(fields: [pessoaId], references: [id], onDelete: Cascade)
+  encontro Encontro @relation(fields: [encontroId], references: [id], onDelete: Cascade)
+
+  @@unique([pessoaId, encontroId])
 }
 

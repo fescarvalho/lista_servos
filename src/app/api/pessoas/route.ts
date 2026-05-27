@@ -16,7 +16,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const { nome, bairro, dataNascimento } = result.data
+    const { nome, bairro, dataNascimento, status } = result.data
 
     // Save to database
     const novaPessoa = await prisma.pessoa.create({
@@ -24,6 +24,7 @@ export async function POST(request: Request) {
         nome: nome,
         bairro: bairro,
         dataNascimento: dataNascimento,
+        status: status,
       },
     })
 
@@ -47,12 +48,27 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
+    const totalEncontros = await prisma.encontro.count();
+    
     const pessoas = await prisma.pessoa.findMany({
       orderBy: {
         nome: 'asc',
       },
+      include: {
+        _count: {
+          select: { presencas: true }
+        }
+      }
     })
-    return NextResponse.json(pessoas)
+
+    const pessoasComPresenca = pessoas.map(p => ({
+      ...p,
+      porcentagemPresenca: totalEncontros === 0 ? 0 : Math.round((p._count.presencas / totalEncontros) * 100),
+      totalPresencas: p._count.presencas,
+      totalEncontros
+    }));
+
+    return NextResponse.json(pessoasComPresenca)
   } catch (error) {
     console.error('Error fetching pessoas:', error)
     return NextResponse.json(

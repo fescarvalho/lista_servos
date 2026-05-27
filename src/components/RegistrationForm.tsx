@@ -13,6 +13,7 @@ export default function RegistrationForm() {
     nome: '',
     bairro: '',
     dataNascimento: '',
+    status: 'EM_FORMACAO',
   })
   const [errors, setErrors] = useState<{ nome?: string; bairro?: string; dataNascimento?: string }>({})
 
@@ -57,7 +58,7 @@ export default function RegistrationForm() {
       
       setSubmitted(true)
       // Clear form
-      setFormData({ nome: '', bairro: '', dataNascimento: '' })
+      setFormData({ nome: '', bairro: '', dataNascimento: '', status: 'EM_FORMACAO' })
     } catch (error: any) {
       toast.error(error.message || 'Ocorreu um erro inesperado')
     } finally {
@@ -175,6 +176,36 @@ export default function RegistrationForm() {
               {errors.dataNascimento && (
                 <p className="mt-1 text-sm text-red-500">{errors.dataNascimento}</p>
               )}
+            </div>
+
+            <div>
+              <label htmlFor="status" className="block text-sm font-medium text-slate-700 mb-1">
+                Status
+              </label>
+              <div className="flex gap-4">
+                <label className="flex items-center gap-2 cursor-pointer bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl hover:bg-slate-100 transition-colors flex-1">
+                  <input
+                    type="radio"
+                    name="status"
+                    value="EM_FORMACAO"
+                    checked={formData.status === 'EM_FORMACAO'}
+                    onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                    className="w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500"
+                  />
+                  <span className="text-slate-700 font-medium text-sm">Em Formação</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl hover:bg-slate-100 transition-colors flex-1">
+                  <input
+                    type="radio"
+                    name="status"
+                    value="ATIVO"
+                    checked={formData.status === 'ATIVO'}
+                    onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                    className="w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500"
+                  />
+                  <span className="text-slate-700 font-medium text-sm">Ativo</span>
+                </label>
+              </div>
             </div>
 
             <button

@@ -53,7 +53,7 @@ export async function PUT(
       )
     }
 
-    const { nome, bairro, dataNascimento } = result.data
+    const { nome, bairro, dataNascimento, status } = result.data
 
     const updatedPessoa = await prisma.pessoa.update({
       where: { id },
@@ -61,6 +61,7 @@ export async function PUT(
         nome,
         bairro,
         dataNascimento,
+        status,
       },
     })
 

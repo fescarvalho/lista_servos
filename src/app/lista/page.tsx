@@ -18,7 +18,8 @@ export default function ListaPage() {
   const [editForm, setEditForm] = useState({
     nome: '',
     bairro: '',
-    dataNascimento: ''
+    dataNascimento: '',
+    status: 'EM_FORMACAO'
   })
   const [activeTab, setActiveTab] = useState<'lista' | 'relatorios'>('lista')
 
@@ -80,7 +81,8 @@ export default function ListaPage() {
     setEditForm({
       nome: pessoa.nome,
       bairro: pessoa.bairro || '',
-      dataNascimento: new Date(pessoa.dataNascimento).toISOString().split('T')[0]
+      dataNascimento: new Date(pessoa.dataNascimento).toISOString().split('T')[0],
+      status: pessoa.status || 'EM_FORMACAO'
     })
   }
 
@@ -200,7 +202,14 @@ export default function ListaPage() {
             <h1 className="text-3xl font-bold text-slate-800">Painel do Administrador</h1>
           </div>
           
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-4">
+            <Link
+              href="/encontros"
+              className="px-4 py-2 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 rounded-xl text-sm font-bold flex items-center gap-2 transition-colors"
+            >
+              <Calendar size={18} />
+              Lista de Presença
+            </Link>
             <div className="bg-white px-4 py-2 rounded-xl border border-slate-200 shadow-sm flex items-center gap-2 text-slate-600">
               <Users size={20} className="text-indigo-500" />
               <span className="font-bold text-lg">{pessoas.length}</span>
@@ -258,13 +267,14 @@ export default function ListaPage() {
                       <th className="px-2 sm:px-6 py-4 text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100">Bairro</th>
                       <th className="px-2 sm:px-6 py-4 text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100">Nascimento</th>
                       <th className="px-2 sm:px-6 py-4 text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100 hidden lg:table-cell">Data Cadastro</th>
+                      <th className="px-2 sm:px-6 py-4 text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100 text-center">Frequência</th>
                       <th className="px-2 sm:px-6 py-4 text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100 text-right">Ações</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
                     {loading ? (
                       <tr>
-                        <td colSpan={5} className="px-6 py-12 text-center">
+                        <td colSpan={6} className="px-6 py-12 text-center">
                           <div className="flex flex-col items-center gap-2 text-slate-400">
                             <div className="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
                             Carregando dados...
@@ -273,7 +283,7 @@ export default function ListaPage() {
                       </tr>
                     ) : pessoas.length === 0 ? (
                       <tr>
-                        <td colSpan={5} className="px-6 py-12 text-center text-slate-400 italic">
+                        <td colSpan={6} className="px-6 py-12 text-center text-slate-400 italic">
                           Nenhum cadastro encontrado.
                         </td>
                       </tr>
@@ -281,7 +291,12 @@ export default function ListaPage() {
                       pessoas.map((pessoa) => (
                         <tr key={pessoa.id} className="hover:bg-indigo-50/30 transition-colors group">
                           <td className="px-2 sm:px-6 py-3 sm:py-4">
-                            <span className="font-semibold text-slate-800 text-xs sm:text-sm">{pessoa.nome}</span>
+                            <div className="flex flex-col gap-1 items-start">
+                              <span className="font-semibold text-slate-800 text-xs sm:text-sm">{pessoa.nome}</span>
+                              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${pessoa.status === 'ATIVO' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'}`}>
+                                {pessoa.status === 'ATIVO' ? 'Ativo' : 'Em Formação'}
+                              </span>
+                            </div>
                           </td>
                           <td className="px-2 sm:px-6 py-3 sm:py-4">
                             <div className="flex items-center gap-1 sm:gap-2 text-slate-600 text-xs sm:text-sm">
@@ -297,6 +312,16 @@ export default function ListaPage() {
                           </td>
                           <td className="px-2 sm:px-6 py-3 sm:py-4 text-slate-400 text-[10px] sm:text-sm hidden lg:table-cell">
                             {new Date(pessoa.createdAt).toLocaleString('pt-BR')}
+                          </td>
+                          <td className="px-2 sm:px-6 py-3 sm:py-4 text-center">
+                            <div className="flex flex-col items-center">
+                              <span className={`font-bold ${pessoa.porcentagemPresenca >= 75 ? 'text-emerald-600' : pessoa.porcentagemPresenca >= 50 ? 'text-amber-500' : 'text-red-500'}`}>
+                                {pessoa.porcentagemPresenca ?? 0}%
+                              </span>
+                              <span className="text-[10px] text-slate-400">
+                                {pessoa.totalPresencas ?? 0}/{pessoa.totalEncontros ?? 0}
+                              </span>
+                            </div>
                           </td>
                           <td className="px-2 sm:px-6 py-3 sm:py-4 text-right">
                             <div className="flex items-center justify-end gap-1 sm:gap-2 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-opacity">
@@ -504,6 +529,34 @@ export default function ListaPage() {
                         onChange={(e) => setEditForm({...editForm, dataNascimento: e.target.value})}
                         className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-10 pr-4 outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-slate-800"
                       />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-slate-700 ml-1">Status</label>
+                    <div className="flex gap-4">
+                      <label className="flex items-center gap-2 cursor-pointer bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl hover:bg-slate-100 transition-colors flex-1">
+                        <input
+                          type="radio"
+                          name="editStatus"
+                          value="EM_FORMACAO"
+                          checked={editForm.status === 'EM_FORMACAO'}
+                          onChange={(e) => setEditForm({ ...editForm, status: e.target.value })}
+                          className="w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500"
+                        />
+                        <span className="text-slate-700 font-medium text-sm">Em Formação</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer bg-slate-50 border border-slate-200 px-4 py-3 rounded-xl hover:bg-slate-100 transition-colors flex-1">
+                        <input
+                          type="radio"
+                          name="editStatus"
+                          value="ATIVO"
+                          checked={editForm.status === 'ATIVO'}
+                          onChange={(e) => setEditForm({ ...editForm, status: e.target.value })}
+                          className="w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500"
+                        />
+                        <span className="text-slate-700 font-medium text-sm">Ativo</span>
+                      </label>
                     </div>
                   </div>
 
