@@ -32,3 +32,43 @@ export async function GET(
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 });
   }
 }
+
+export async function PUT(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const data = await request.json();
+
+    const encontroAtualizado = await prisma.encontro.update({
+      where: { id },
+      data: {
+        data: data.data ? new Date(data.data) : undefined,
+        tema: data.tema,
+      }
+    });
+
+    return NextResponse.json(encontroAtualizado);
+  } catch (error) {
+    console.error('Erro ao atualizar encontro:', error);
+    return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 });
+  }
+}
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    await prisma.encontro.delete({
+      where: { id }
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Erro ao deletar encontro:', error);
+    return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 });
+  }
+}
