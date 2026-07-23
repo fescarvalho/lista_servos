@@ -25,11 +25,12 @@ model Encontro {
 }
 
 model Presenca {
-  id         String   @id @default(uuid())
-  pessoaId   String
-  encontroId String
-  presente   Boolean  @default(true)
-  createdAt  DateTime @default(now())
+  id          String   @id @default(uuid())
+  pessoaId    String
+  encontroId  String
+  presente    Boolean  @default(true)
+  justificada Boolean  @default(false)
+  createdAt   DateTime @default(now())
 
   pessoa   Pessoa   @relation(fields: [pessoaId], references: [id], onDelete: Cascade)
   encontro Encontro @relation(fields: [encontroId], references: [id], onDelete: Cascade)

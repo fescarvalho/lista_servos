@@ -55,18 +55,31 @@ export async function GET(request: Request) {
         nome: 'asc',
       },
       include: {
-        _count: {
-          select: { presencas: true }
-        }
+        presencas: true
       }
     })
 
-    const pessoasComPresenca = pessoas.map(p => ({
-      ...p,
-      porcentagemPresenca: totalEncontros === 0 ? 0 : Math.round((p._count.presencas / totalEncontros) * 100),
-      totalPresencas: p._count.presencas,
-      totalEncontros
-    }));
+    const pessoasComPresenca = pessoas.map(p => {
+      let presences = 0;
+      let justifiedAbsences = 0;
+
+      p.presencas.forEach(pr => {
+        if (pr.presente) {
+          presences++;
+        } else if (pr.justificada) {
+          justifiedAbsences++;
+        }
+      });
+
+      const effectiveTotalEncontros = totalEncontros - justifiedAbsences;
+
+      return {
+        ...p,
+        porcentagemPresenca: effectiveTotalEncontros === 0 ? 0 : Math.round((presences / effectiveTotalEncontros) * 100),
+        totalPresencas: presences,
+        totalEncontros: effectiveTotalEncontros
+      };
+    });
 
     return NextResponse.json(pessoasComPresenca)
   } catch (error) {

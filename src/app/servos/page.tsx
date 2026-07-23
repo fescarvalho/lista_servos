@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Calendar, Users, Check, X, Minus, Activity, ArrowLeft } from 'lucide-react'
+import { Calendar, Users, Check, X, Minus, Activity, ArrowLeft, Info } from 'lucide-react'
 import Link from 'next/link'
 
 type Encontro = {
@@ -15,7 +15,7 @@ type Pessoa = {
   id: string
   nome: string
   frequencia: number
-  presencasMap: Record<string, boolean>
+  presencasMap: Record<string, string>
 }
 
 export default function ServosDashboard() {
@@ -208,9 +208,13 @@ export default function ServosDashboard() {
                             <td key={enc.id} className="p-4 border-b border-slate-100 text-center">
                               <div className="flex justify-center">
                                 {isPast ? (
-                                  presente === true ? (
+                                  presente === 'PRESENTE' ? (
                                     <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shadow-sm">
                                       <Check size={18} strokeWidth={3} />
+                                    </div>
+                                  ) : presente === 'JUSTIFICADA' ? (
+                                    <div className="w-8 h-8 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center shadow-sm" title="Falta Justificada">
+                                      <Info size={18} strokeWidth={3} />
                                     </div>
                                   ) : (
                                     <div className="w-8 h-8 rounded-full bg-rose-100 text-rose-500 flex items-center justify-center shadow-sm">
@@ -259,9 +263,13 @@ export default function ServosDashboard() {
                             <div key={enc.id} className="flex-shrink-0 flex flex-col items-center gap-2 w-[60px]">
                               <span className="text-[11px] font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-md">{formatDate(enc.data)}</span>
                               {isPast ? (
-                                presente === true ? (
+                                presente === 'PRESENTE' ? (
                                   <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shadow-sm">
                                     <Check size={20} strokeWidth={3} />
+                                  </div>
+                                ) : presente === 'JUSTIFICADA' ? (
+                                  <div className="w-10 h-10 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center shadow-sm" title="Falta Justificada">
+                                    <Info size={20} strokeWidth={3} />
                                   </div>
                                 ) : (
                                   <div className="w-10 h-10 rounded-full bg-rose-100 text-rose-500 flex items-center justify-center shadow-sm">
@@ -299,6 +307,12 @@ export default function ServosDashboard() {
                 <X size={14} strokeWidth={3} />
               </div>
               <span>Falta</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center">
+                <Info size={14} strokeWidth={3} />
+              </div>
+              <span>Falta Justificada</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-6 h-6 rounded-full border-2 border-dashed border-slate-200 text-slate-300 flex items-center justify-center">

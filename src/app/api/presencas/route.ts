@@ -3,9 +3,9 @@ import prisma from '@/lib/prisma';
 
 export async function POST(request: Request) {
   try {
-    const { pessoaId, encontroId, presente } = await request.json();
+    const { pessoaId, encontroId, status } = await request.json(); // status: 'PRESENTE' | 'FALTA' | 'JUSTIFICADA'
 
-    if (presente) {
+    if (status === 'PRESENTE') {
       // Marcar presença
       const presenca = await prisma.presenca.upsert({
         where: {
@@ -14,11 +14,30 @@ export async function POST(request: Request) {
             encontroId
           }
         },
-        update: { presente: true },
+        update: { presente: true, justificada: false },
         create: {
           pessoaId,
           encontroId,
-          presente: true
+          presente: true,
+          justificada: false
+        }
+      });
+      return NextResponse.json(presenca);
+    } else if (status === 'JUSTIFICADA') {
+      // Marcar falta justificada
+      const presenca = await prisma.presenca.upsert({
+        where: {
+          pessoaId_encontroId: {
+            pessoaId,
+            encontroId
+          }
+        },
+        update: { presente: false, justificada: true },
+        create: {
+          pessoaId,
+          encontroId,
+          presente: false,
+          justificada: true
         }
       });
       return NextResponse.json(presenca);

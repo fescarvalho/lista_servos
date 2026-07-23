@@ -35,27 +35,42 @@ export async function GET() {
 
     const formattedPessoas = pessoas.map(pessoa => {
       let presencesInPastMeetings = 0;
+      let justifiedAbsences = 0;
 
       // Count presences only for past meetings
       pastEncontros.forEach(encontro => {
-        const hasPresence = pessoa.presencas.some(
-          p => p.encontroId === encontro.id && p.presente === true
-        );
-        if (hasPresence) {
-          presencesInPastMeetings++;
+        const presencaRecord = pessoa.presencas.find(p => p.encontroId === encontro.id);
+        
+        if (presencaRecord) {
+          if (presencaRecord.presente) {
+            presencesInPastMeetings++;
+          } else if (presencaRecord.justificada) {
+            justifiedAbsences++;
+          }
         }
       });
 
-      const frequency = totalPast > 0 
-        ? Math.round((presencesInPastMeetings / totalPast) * 100) 
-        : 100; // If no past meetings, 100% frequency? Or 0. Let's say 0 if totalPast is 0.
+      const effectiveTotalPast = totalPast - justifiedAbsences;
+
+      const frequency = effectiveTotalPast > 0 
+        ? Math.round((presencesInPastMeetings / effectiveTotalPast) * 100) 
+        : (totalPast > 0 ? 0 : 100); 
       
       const adjustedFrequency = totalPast > 0 ? frequency : 0;
 
-      // Map presences for easier frontend consumption
-      const presencasMap: Record<string, boolean> = {};
+      // Map presences for easier frontend consumption. 
+      // presente = true -> Presente
+      // presente = false, justificada = true -> Justificada
+      // presente = false, justificada = false -> Falta
+      const presencasMap: Record<string, string> = {};
       pessoa.presencas.forEach(p => {
-        presencasMap[p.encontroId] = p.presente;
+        if (p.presente) {
+          presencasMap[p.encontroId] = 'PRESENTE';
+        } else if (p.justificada) {
+          presencasMap[p.encontroId] = 'JUSTIFICADA';
+        } else {
+          presencasMap[p.encontroId] = 'FALTA';
+        }
       });
 
       return {

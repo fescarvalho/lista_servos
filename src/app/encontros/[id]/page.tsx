@@ -13,6 +13,8 @@ type Presenca = {
   id: string;
   pessoaId: string;
   encontroId: string;
+  presente: boolean;
+  justificada: boolean;
 };
 
 export default function EncontroDetailsPage({ params }: { params: Promise<{ id: string }> }) {
@@ -22,7 +24,7 @@ export default function EncontroDetailsPage({ params }: { params: Promise<{ id: 
   const router = useRouter();
   const [encontro, setEncontro] = useState<any>(null);
   const [pessoas, setPessoas] = useState<Pessoa[]>([]);
-  const [presencas, setPresencas] = useState<Set<string>>(new Set());
+  const [presencas, setPresencas] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
 
   // Edit state
@@ -45,9 +47,13 @@ export default function EncontroDetailsPage({ params }: { params: Promise<{ id: 
             setEditData(new Date(data.encontro.data).toISOString().split('T')[0]);
           }
           
-          const presencasSet = new Set<string>();
-          data.encontro.presencas.forEach((p: Presenca) => presencasSet.add(p.pessoaId));
-          setPresencas(presencasSet);
+          const presencasMap: Record<string, string> = {};
+          data.encontro.presencas.forEach((p: Presenca) => {
+            if (p.presente) presencasMap[p.pessoaId] = 'PRESENTE';
+            else if (p.justificada) presencasMap[p.pessoaId] = 'JUSTIFICADA';
+            else presencasMap[p.pessoaId] = 'FALTA';
+          });
+          setPresencas(presencasMap);
         }
       } catch (err) {
         console.error(err);
@@ -57,17 +63,12 @@ export default function EncontroDetailsPage({ params }: { params: Promise<{ id: 
     fetchData();
   }, [id]);
 
-  const togglePresenca = async (pessoaId: string) => {
-    const isPresente = presencas.has(pessoaId);
-    
+  const setPresencaStatus = async (pessoaId: string, status: string) => {
     // Optimistic UI update
-    const newPresencas = new Set(presencas);
-    if (isPresente) {
-      newPresencas.delete(pessoaId);
-    } else {
-      newPresencas.add(pessoaId);
-    }
-    setPresencas(newPresencas);
+    setPresencas(prev => ({
+      ...prev,
+      [pessoaId]: status
+    }));
 
     try {
       await fetch('/api/presencas', {
@@ -76,12 +77,11 @@ export default function EncontroDetailsPage({ params }: { params: Promise<{ id: 
         body: JSON.stringify({
           pessoaId,
           encontroId: id,
-          presente: !isPresente
+          status
         }),
       });
     } catch (err) {
       console.error(err);
-      // Revert on error could be implemented here
     }
   };
 
@@ -125,6 +125,8 @@ export default function EncontroDetailsPage({ params }: { params: Promise<{ id: 
 
   if (loading) return <div className="p-8 text-center">Carregando...</div>;
   if (!encontro) return <div className="p-8 text-center text-red-500">Encontro não encontrado.</div>;
+
+  const presentesCount = Object.values(presencas).filter(s => s === 'PRESENTE').length;
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
@@ -200,25 +202,47 @@ export default function EncontroDetailsPage({ params }: { params: Promise<{ id: 
           <div className="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
             <h2 className="font-bold text-lg text-slate-800">Lista de Presença</h2>
             <span className="bg-indigo-100 text-indigo-800 text-sm font-bold px-4 py-1 rounded-full">
-              {presencas.size} / {pessoas.length} presentes
+              {presentesCount} / {pessoas.length} presentes
             </span>
           </div>
           <div className="divide-y divide-slate-100">
             {pessoas.map(pessoa => {
-              const isPresente = presencas.has(pessoa.id);
+              const status = presencas[pessoa.id] || 'FALTA';
               return (
-                <div key={pessoa.id} className="p-4 flex items-center justify-between hover:bg-slate-50 transition-colors">
+                <div key={pessoa.id} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between hover:bg-slate-50 transition-colors gap-3">
                   <span className="font-semibold text-slate-800">{pessoa.nome}</span>
-                  <button
-                    onClick={() => togglePresenca(pessoa.id)}
-                    className={`px-6 py-2 rounded-xl font-bold transition-all ${
-                      isPresente 
-                        ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200 shadow-sm' 
-                        : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
-                    }`}
-                  >
-                    {isPresente ? 'Presente' : 'Ausente'}
-                  </button>
+                  <div className="flex bg-slate-100 p-1 rounded-xl w-fit">
+                    <button
+                      onClick={() => setPresencaStatus(pessoa.id, 'PRESENTE')}
+                      className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${
+                        status === 'PRESENTE' 
+                          ? 'bg-emerald-100 text-emerald-800 shadow-sm' 
+                          : 'text-slate-500 hover:text-slate-700'
+                      }`}
+                    >
+                      Presente
+                    </button>
+                    <button
+                      onClick={() => setPresencaStatus(pessoa.id, 'JUSTIFICADA')}
+                      className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${
+                        status === 'JUSTIFICADA' 
+                          ? 'bg-amber-100 text-amber-800 shadow-sm' 
+                          : 'text-slate-500 hover:text-slate-700'
+                      }`}
+                    >
+                      Justificada
+                    </button>
+                    <button
+                      onClick={() => setPresencaStatus(pessoa.id, 'FALTA')}
+                      className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${
+                        status === 'FALTA' 
+                          ? 'bg-rose-100 text-rose-800 shadow-sm' 
+                          : 'text-slate-500 hover:text-slate-700'
+                      }`}
+                    >
+                      Falta
+                    </button>
+                  </div>
                 </div>
               );
             })}
